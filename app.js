@@ -5,6 +5,7 @@ const Razorpay = require("razorpay");
 require('dotenv').config();
 const mockData = require('./mockData');
 const nodemailer = require('nodemailer');
+const path = require('path')
 // const twilio = require('twilio');
 const crypto = require('crypto');
 
@@ -23,7 +24,7 @@ app.use(express.json());
 
 
 
-const sendEmail = async (product, amount) => {
+const sendEmail = async (product, amount,userDetails,order_id,payment_id) => {
   let transporter = nodemailer.createTransport({
     service: 'gmail', // Or any other service you are using
     auth: {
@@ -36,7 +37,28 @@ const sendEmail = async (product, amount) => {
     from: process.env.EMAIL_USER,
     to: process.env.OWNER_EMAIL, // Owner's email
     subject: `New Payment for Product`,
-    text: `A new payment has been made for ${product.name}. Amount: ₹${amount / 100}.`
+    text: `A new payment has been made for ${product.name}. Amount: ₹${amount / 100}. \n Customer Name: ${userDetails.name} \n Customer Email: ${userDetails.email} \n Customer Contact: ${userDetails.phone} \n Customer Adress: ${userDetails.address}\n\n\n Order_id = ${order_id}\n Payment ID = ${payment_id}`,
+    html: `
+      <p>A new payment has been made for <strong>${product.name}</strong>. Amount: ₹${amount / 100}.</p>
+      <p><strong>Customer Details:</strong></p>
+      <ul>
+        <li><strong>Name:</strong> ${userDetails.name}</li>
+        <li><strong>Email:</strong> ${userDetails.email}</li>
+        <li><strong>Contact:</strong> ${userDetails.phone}</li>
+        <li><strong>Address:</strong> ${userDetails.address}</li>
+      </ul>
+      <p><strong>Order ID:</strong> ${order_id}</p>
+      <p><strong>Payment ID:</strong> ${payment_id}</p>
+      <p>See the image below:</p>
+      <img src="cid:unique@nodemailer" alt="Product Image"/>
+    `,
+    attachments: [
+      {
+        filename: `${product.img[0]}`, // Name of the image file (you can change it as needed)
+        path: path.join(__dirname, 'Public','assets','products', `${product.img[0]}.jpg`), // Path to the image in your backend's static folder
+        cid: 'unique@nodemailer' // Ensure that each image has a unique cid for inline images (optional, used for inline images)
+      }
+    ]
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
@@ -106,8 +128,8 @@ app.post("/paymentVerification", async (req, res) => {
     if (digest === signature) {
       // Payment is successful
       // Send Email and WhatsApp here
-    //   await sendEmail(product, amount);
-      await sendWhatsAppMessage(product, amount);
+      await sendEmail(product, amount,userDetails, order_id,payment_id);
+      // await sendWhatsAppMessage(product, amount);
   
       res.status(200).json({ success: true, message: "Payment verified" });
     } else {
