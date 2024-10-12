@@ -142,6 +142,8 @@ const sendWhatsAppMessage = async (product, amount) => {
 
 app.post("/paymentVerification", async (req, res) => {
     const { order_id,payment_id,signature } = req.body;
+  console.log("from payment verification block",order_id,payment_id,signature)
+
   
     const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     shasum.update(order_id + "|" + payment_id);
@@ -150,6 +152,7 @@ app.post("/paymentVerification", async (req, res) => {
     if (digest === signature) {
       // Payment is successful
       // Send Email and WhatsApp here
+      console.log("from digest", product,amount, userDetails,order_id,payment_id)
       await sendEmail(product, amount,userDetails, order_id,payment_id);
       // await sendWhatsAppMessage(product, amount);
   
