@@ -174,5 +174,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(process.env.PORT ,()=>{
-  console.log(`Server is running at port ${process.env.PORT}`)
+  console.log(`Server is running at port ${process.env.PORT}`);
+  console.log("new changes updated")
 })
