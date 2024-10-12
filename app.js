@@ -110,7 +110,7 @@ const client = require('twilio')(accountSid, authToken);
 let amount;
 let product;
 let userDetails;
-app.post('api/buyProduct',async(req,res)=>{
+app.post('/api/buyProduct',async(req,res)=>{
     try{
             const rzp = new Razorpay({
             key_id:process.env.RAZORPAY_KEY_ID,
@@ -140,7 +140,7 @@ const sendWhatsAppMessage = async (product, amount) => {
       .catch(err => console.log(err));
  };
 
-app.post("api/paymentVerification", async (req, res) => {
+app.post("/api/paymentVerification", async (req, res) => {
     const { order_id,payment_id,signature } = req.body;
   console.log("from payment verification block",order_id,payment_id,signature)
 
@@ -162,7 +162,7 @@ app.post("api/paymentVerification", async (req, res) => {
     }
   });
 
-app.post("api/updateFailureTransactionStatus", async(req,res)=>{
+app.post("/api/updateFailureTransactionStatus", async(req,res)=>{
     try {
         const {payment_id,order_id}= req.body;
         res.status(200).json({message:"Transaction Successfull",success:true})
@@ -178,5 +178,5 @@ app.use((err, req, res, next) => {
 
 app.listen(process.env.PORT ,()=>{
   console.log(`Server is running at port ${process.env.PORT}`);
-  console.log("new changes updated")
+  console.log("new changes updated 02")
 })
